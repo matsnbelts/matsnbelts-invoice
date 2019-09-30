@@ -22,8 +22,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Builder
 public class InvoiceGenerator {
@@ -33,7 +36,24 @@ public class InvoiceGenerator {
     private String area;
     private String cityPincode;
     private String vehicle = "Car";
+    private String invoiceMonth;
 
+    public static HashMap<String, String> monthMap = new LinkedHashMap<>();
+    static {
+        monthMap.put("January", "01");
+        monthMap.put("February", "02");
+        monthMap.put("March", "03");
+        monthMap.put("April", "04");
+        monthMap.put("May", "05");
+        monthMap.put("June", "06");
+        monthMap.put("July", "07");
+        monthMap.put("August", "08");
+        monthMap.put("September", "09");
+        monthMap.put("October", "10");
+        monthMap.put("November", "11");
+        monthMap.put("December", "12");
+
+    }
     public void generateInvoicePdf(final String invoiceDate, final String paymentDueDate) throws IOException {
         if(area == null) {
             area = "";
@@ -127,8 +147,13 @@ public class InvoiceGenerator {
             cell = new Cell(1, 1).add(
                     getUnitsColumnParagraph(car.getCarType(), TextAlignment.LEFT));
             table.addCell(cell);
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            LocalDate convertedDate = LocalDate.parse("01/" + monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
+            String endDate = convertedDate.withDayOfMonth(
+                    convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             cell = new Cell(1, 1).add(
-                    getUnitsColumnParagraph(car.getStartDate() + " - " + "31/08/2019", TextAlignment.LEFT));
+                    getUnitsColumnParagraph(car.getStartDate() + " - " + endDate, TextAlignment.LEFT));
             table.addCell(cell);
             cell = new Cell(1, 1).add(
                     getUnitsColumnParagraph("1", TextAlignment.RIGHT));

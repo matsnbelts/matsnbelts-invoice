@@ -2,10 +2,13 @@ package com.matsnbelts.processor;
 
 import com.matsnbelts.model.CustomerCar;
 import com.matsnbelts.model.CustomerProfile;
+import com.matsnbelts.model.InvoiceGenerator;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class LoadCustomerDetails {
@@ -38,6 +41,8 @@ public class LoadCustomerDetails {
 
     private static final double BIKE_PRICE = 300;
     private Map<Integer, Map<String, Map<String, Double>>> priceMap;
+    private String startDate;
+    private String endDate;
 
     private double applyPromocode(double actualRate, String promoCode) {
         double discountRate;
@@ -58,7 +63,14 @@ public class LoadCustomerDetails {
         }
         return discountRate;
     }
-    public LoadCustomerDetails() {
+    public LoadCustomerDetails(String invoiceMonth) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        LocalDate convertedDate = LocalDate.parse("01/" + InvoiceGenerator.monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
+        this.startDate = convertedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        this.endDate = convertedDate.withDayOfMonth(
+                convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
         priceMap = new LinkedHashMap<Integer, Map<String, Map<String, Double>>>();
 
         Map<String, Double> carMap = new LinkedHashMap<String, Double>();
@@ -113,18 +125,18 @@ public class LoadCustomerDetails {
 
     private double getCarRate(final String pack, final String startDate, final String carType) throws ParseException {
 
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+        Date date = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
         Calendar calendar = Calendar.getInstance();
         //calendar.setTime(new Date());
 
         calendar.setTime(date);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int validDays;
-        if (date.before(new SimpleDateFormat("yyyy-MM-dd").parse("2019-08-01"))
+        if (date.before(new SimpleDateFormat("dd/MM/yyyy").parse(this.startDate))
         ) {
             validDays = 30;
         }
-        else if (date.after(new SimpleDateFormat("yyyy-MM-dd").parse("2019-08-31"))
+        else if (date.after(new SimpleDateFormat("dd/MM/yyyy").parse(this.endDate))
         ) {
             validDays = 0;
 
@@ -184,12 +196,12 @@ public class LoadCustomerDetails {
                 }
                 String carType = row[8];
                 String startDate = row[9];
-                if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).after(new SimpleDateFormat("yyyy-MM-dd").parse("2019-08-31"))
+                if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).after(new SimpleDateFormat("dd/MM/yyyy").parse(this.endDate))
                 ) {
                     continue;
-                } else if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).before(new SimpleDateFormat("yyyy-MM-dd").parse("2019-08-01"))
+                } else if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).before(new SimpleDateFormat("dd/MM/yyyy").parse(this.startDate))
                 ) {
-                    startDate = "2019-08-01";
+                    startDate = this.startDate;
                 }
                 String mobile = (row.length > 10) ? row[10] : "";
                 String email = (row.length > 11) ? row[11] : "";
