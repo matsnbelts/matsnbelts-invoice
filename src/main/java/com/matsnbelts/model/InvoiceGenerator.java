@@ -151,7 +151,7 @@ public class InvoiceGenerator {
             int year = calendar.get(Calendar.YEAR);
             LocalDate convertedDate = LocalDate.parse("01/" + monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
             String endDate = convertedDate.withDayOfMonth(
-                    convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                    convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             cell = new Cell(1, 1).add(
                     getUnitsColumnParagraph(car.getStartDate() + " - " + endDate, TextAlignment.LEFT));
             table.addCell(cell);

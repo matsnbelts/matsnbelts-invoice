@@ -28,7 +28,8 @@ public class SimpleController {
                                   @RequestParam("output") String outputFolder,
                                   @RequestParam("invoice-date") String invoiceDate,
                                   @RequestParam("due-date") String dueDate,
-                                  @RequestParam("invoice-month") String invoiceMonth) throws IOException, ParseException {
+                                  @RequestParam("invoice-month") String invoiceMonth,
+                                  @RequestParam("send-mail") boolean sendMail) throws IOException, ParseException {
         log.info(fileUpload.getContentType());
         log.info("File Name {}", fileUpload.getOriginalFilename());
         BufferedReader br = new BufferedReader(new InputStreamReader(fileUpload.getInputStream()));
@@ -37,15 +38,16 @@ public class SimpleController {
         File outFolder = new File(outputFolder);
         assert(outFolder.exists());
         File[] invoiceFiles = outFolder.listFiles((dir, name) -> name.endsWith(".pdf"));
-        if(invoiceFiles!= null && invoiceFiles.length > 0) {
-            for(File file : invoiceFiles) {
-                file.delete();
+        if(!sendMail) {
+            if (invoiceFiles != null && invoiceFiles.length > 0) {
+                for (File file : invoiceFiles) {
+                    file.delete();
+                }
             }
         }
-
         invoiceGeneratorService.generateInvoice(fileUpload.getInputStream(), outFolder,
-                invoiceDate, dueDate, invoiceMonth);
+                invoiceDate, dueDate, invoiceMonth, sendMail);
         invoiceFiles = outFolder.listFiles((dir, name) -> name.endsWith(".pdf"));
         return String.valueOf(invoiceFiles != null ? invoiceFiles.length : 0);
     }
-}
+    }

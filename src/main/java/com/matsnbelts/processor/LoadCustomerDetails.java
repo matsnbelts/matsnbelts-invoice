@@ -37,6 +37,7 @@ public class LoadCustomerDetails {
         static final String SMALL_CAR = "Small Car";
         static final String SEDAN = "Sedan";
         static final String SUV = "SUV";
+        static final String PREMIUM = "Premium";
     }
 
     private static final double BIKE_PRICE = 300;
@@ -67,9 +68,9 @@ public class LoadCustomerDetails {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         LocalDate convertedDate = LocalDate.parse("01/" + InvoiceGenerator.monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
-        this.startDate = convertedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        this.startDate = convertedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.endDate = convertedDate.withDayOfMonth(
-                convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         priceMap = new LinkedHashMap<Integer, Map<String, Map<String, Double>>>();
 
@@ -78,6 +79,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 500.00);
         carMap.put(CarType.SEDAN, 600.00);
         carMap.put(CarType.SUV, 700.00);
+        carMap.put(CarType.PREMIUM, 900.00);
         Map<String, Map<String, Double>> packMap = new LinkedHashMap<String, Map<String, Double>>();
         packMap.put(Pack.FULL, carMap);
         carMap = new LinkedHashMap<String, Double>();
@@ -85,6 +87,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 300.00);
         carMap.put(CarType.SEDAN, 350.00);
         carMap.put(CarType.SUV, 400.00);
+        carMap.put(CarType.PREMIUM, 450.00);
         packMap.put(Pack.MINI, carMap);
         priceMap.put(DayCriteria.DAYS_MORE_THAN_20, packMap);
 
@@ -94,6 +97,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 300.00);
         carMap.put(CarType.SEDAN, 350.00);
         carMap.put(CarType.SUV, 400.00);
+        carMap.put(CarType.PREMIUM, 650.00);
         packMap = new LinkedHashMap<String, Map<String, Double>>();
         packMap.put(Pack.FULL, carMap);
         carMap = new LinkedHashMap<String, Double>();
@@ -101,6 +105,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 250.00);
         carMap.put(CarType.SEDAN, 300.00);
         carMap.put(CarType.SUV, 350.00);
+        carMap.put(CarType.PREMIUM, 320.00);
         packMap.put(Pack.MINI, carMap);
         priceMap.put(DayCriteria.DAYS_MORE_THAN_8, packMap);
 
@@ -110,6 +115,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 150.00);
         carMap.put(CarType.SEDAN, 200.00);
         carMap.put(CarType.SUV, 250.00);
+        carMap.put(CarType.PREMIUM, 400.00);
         packMap = new LinkedHashMap<String, Map<String, Double>>();
         packMap.put(Pack.FULL, carMap);
         carMap = new LinkedHashMap<String, Double>();
@@ -117,6 +123,7 @@ public class LoadCustomerDetails {
         carMap.put(CarType.SMALL_CAR, 100.00);
         carMap.put(CarType.SEDAN, 125.00);
         carMap.put(CarType.SUV, 150.00);
+        carMap.put(CarType.PREMIUM, 200.00);
         packMap.put(Pack.MINI, carMap);
         priceMap.put(DayCriteria.DAYS_MORE_THAN_3, packMap);
 
@@ -125,18 +132,18 @@ public class LoadCustomerDetails {
 
     private double getCarRate(final String pack, final String startDate, final String carType) throws ParseException {
 
-        Date date = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
         Calendar calendar = Calendar.getInstance();
         //calendar.setTime(new Date());
 
         calendar.setTime(date);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int validDays;
-        if (date.before(new SimpleDateFormat("dd/MM/yyyy").parse(this.startDate))
+        if (date.before(new SimpleDateFormat("yyyy-MM-dd").parse(this.startDate))
         ) {
             validDays = 30;
         }
-        else if (date.after(new SimpleDateFormat("dd/MM/yyyy").parse(this.endDate))
+        else if (date.after(new SimpleDateFormat("yyyy-MM-dd").parse(this.endDate))
         ) {
             validDays = 0;
 
@@ -196,19 +203,20 @@ public class LoadCustomerDetails {
                 }
                 String carType = row[8];
                 String startDate = row[9];
-                if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).after(new SimpleDateFormat("dd/MM/yyyy").parse(this.endDate))
+                if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).after(new SimpleDateFormat("yyyy-MM-dd").parse(this.endDate))
                 ) {
                     continue;
-                } else if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).before(new SimpleDateFormat("dd/MM/yyyy").parse(this.startDate))
+                } else if (new SimpleDateFormat("yyyy-MM-dd").parse(startDate).before(new SimpleDateFormat("yyyy-MM-dd").parse(this.startDate))
                 ) {
                     startDate = this.startDate;
                 }
                 String mobile = (row.length > 10) ? row[10] : "";
                 String email = (row.length > 11) ? row[11] : "";
-                String promo = (row.length > 13) ? row[13] : "";
+                String promo = (row.length > 14) ? row[14] : "";
 
                 CustomerCar.CustomerCarBuilder customerCarBuilder = CustomerCar.builder();
                 carType = (carType.contains(CarType.SUV)) ? CarType.SUV : carType;
+
                 final double actualRate = getCarRate(pack, startDate, carType);
                 CustomerCar customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
                         .actualRate(actualRate).discountRate(applyPromocode(actualRate, promo)).promoCode(promo).startDate(startDate).build();
@@ -228,7 +236,7 @@ public class LoadCustomerDetails {
                     customerProfile.setCars(cars);
                     customerProfileMap.put(cusId, customerProfile);
                 }
-                //System.out.println(customerProfile);
+                System.out.println(customerProfile);
             }
         }
         return customerProfileMap;
