@@ -167,9 +167,13 @@ public class InvoiceGenerator {
                     promoCodeMap.put("Discount for " + i + getDayOfMonthSuffix(i) + " car - " + car.getPromoCode(),
                             String.format("%.02f", discount));
                 }
+                totalAmount += car.getActualRate();
+                totalAmount -= discount;
+            } else {
+                car.setActualRate(car.getDiscountRate());
+                totalAmount = car.getActualRate();
             }
-            totalAmount += car.getActualRate();
-            totalAmount -= discount;
+
             cell = new Cell(1, 1).add(
                     getUnitsColumnParagraph(String.format("%.02f", car.getActualRate()), TextAlignment.RIGHT));
             table.addCell(cell);

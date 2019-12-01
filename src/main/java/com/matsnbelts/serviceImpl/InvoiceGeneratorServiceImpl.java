@@ -42,10 +42,12 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
                 if(to_mail.isEmpty()) {
                     to_mail = "johnpraveen@yahoo.com";
                     System.out.println(":::: " + customerProfileEntry.getValue().getCustomerId());
+                    continue;
                 }
+
                 Mailer.send(from, pwd, to_mail, "Mats And Belts - Invoice Generated for " + invoiceMonth + "'19",
                         "Hey " + customerProfileEntry.getValue().getCustomerName() +
-                                ",\n This is an automatically generated email. Please do not reply to it.\n",
+                                ",\n Kindly ignore if already paid. \nThis is an automatically generated email. Please do not reply to it.\n",
                         outputFolder.getAbsolutePath() + File.separator + customerProfileEntry.getValue().getCustomerId()+ ".pdf", "");
             }
         }

@@ -61,8 +61,9 @@ public class Mailer{
 
             //send message
             Transport.send(message);
-            System.out.println("message sent successfully");
+            System.out.println("message sent successfully to: " + to);
         } catch (Exception e) {
+            System.out.println("message sent failed to: " + to);
             sendMailToAdmin(to, filename);
         }
 
@@ -115,8 +116,8 @@ public class Mailer{
             //send message
             Transport.send(message);
             System.out.println("message sent successfully");
-        } catch (MessagingException e) {
-
+        } catch (Exception e) {
+            System.out.println("Exception: " + to);
         }
     }
 }

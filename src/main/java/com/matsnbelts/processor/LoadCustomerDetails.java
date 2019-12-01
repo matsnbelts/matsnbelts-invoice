@@ -12,13 +12,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class LoadCustomerDetails {
-    private static class PromoCriteria {
+    public static class PromoCriteria {
         static final String PROMO100  = "PromoHundred";
         static final String PROMO200 = "Promo200";
         static final String PROMO20= "Promo20%";
         static final String PROMO_FREE = "PromoFree";
         static final String PROMO_50 = "Promo50";
-        static final String PLUS_100 = "Plus100";
+        public static final String PLUS_100 = "Plus100";
     }
 
     private static class DayCriteria {
@@ -58,7 +58,7 @@ public class LoadCustomerDetails {
         } else if(promoCode.equalsIgnoreCase(PromoCriteria.PROMO_50)) {
             discountRate = actualRate - 50;
         } else if(promoCode.equalsIgnoreCase(PromoCriteria.PLUS_100)) {
-            discountRate = actualRate - 100;
+            discountRate = -100;
         } else {
             discountRate = actualRate;
         }
@@ -218,8 +218,14 @@ public class LoadCustomerDetails {
                 carType = (carType.contains(CarType.SUV)) ? CarType.SUV : carType;
 
                 final double actualRate = getCarRate(pack, startDate, carType);
-                CustomerCar customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
-                        .actualRate(actualRate).discountRate(applyPromocode(actualRate, promo)).promoCode(promo).startDate(startDate).build();
+                CustomerCar customerCar;
+                if(promo.equalsIgnoreCase(PromoCriteria.PLUS_100)) {
+                    customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
+                            .actualRate(actualRate).discountRate(actualRate+100).promoCode(promo).startDate(startDate).build();
+                } else {
+                    customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
+                            .actualRate(actualRate).discountRate(applyPromocode(actualRate, promo)).promoCode(promo).startDate(startDate).build();
+                }
                 CustomerProfile customerProfile;
                 if(!customerProfileMap.containsKey(cusId)) {
                     List<CustomerCar> cars = new LinkedList<>();
