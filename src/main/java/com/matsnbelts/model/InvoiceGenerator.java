@@ -22,11 +22,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Builder
 public class InvoiceGenerator {
@@ -171,7 +172,7 @@ public class InvoiceGenerator {
                 totalAmount -= discount;
             } else {
                 car.setActualRate(car.getDiscountRate());
-                totalAmount = car.getActualRate();
+                totalAmount += car.getActualRate();
             }
 
             cell = new Cell(1, 1).add(

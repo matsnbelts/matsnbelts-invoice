@@ -21,6 +21,7 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
                                 final String invoiceDate, final String paymentDueDate,
                                 final String invoiceMonth, final boolean sendMail)
             throws IOException, ParseException {
+        System.out.println("dddkddd " + invoiceMonth);
         LoadCustomerDetails loadCustomerDetails = new LoadCustomerDetails(invoiceMonth);
         Map<String, CustomerProfile> customerProfileMap = loadCustomerDetails
                 .loadCustomersPaymentDetails(csvFileInputStream);

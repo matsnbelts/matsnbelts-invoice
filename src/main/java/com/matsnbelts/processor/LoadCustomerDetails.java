@@ -19,6 +19,7 @@ public class LoadCustomerDetails {
         static final String PROMO_FREE = "PromoFree";
         static final String PROMO_50 = "Promo50";
         public static final String PLUS_100 = "Plus100";
+        public static final String PLUS_200 = "Plus200";
     }
 
     private static class DayCriteria {
@@ -59,6 +60,8 @@ public class LoadCustomerDetails {
             discountRate = actualRate - 50;
         } else if(promoCode.equalsIgnoreCase(PromoCriteria.PLUS_100)) {
             discountRate = -100;
+        } else if(promoCode.equalsIgnoreCase(PromoCriteria.PLUS_200)) {
+            discountRate = -200;
         } else {
             discountRate = actualRate;
         }
@@ -67,6 +70,7 @@ public class LoadCustomerDetails {
     public LoadCustomerDetails(String invoiceMonth) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
+        System.out.println("loadcust   " + invoiceMonth);
         LocalDate convertedDate = LocalDate.parse("01/" + InvoiceGenerator.monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
         this.startDate = convertedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.endDate = convertedDate.withDayOfMonth(
@@ -222,7 +226,11 @@ public class LoadCustomerDetails {
                 if(promo.equalsIgnoreCase(PromoCriteria.PLUS_100)) {
                     customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
                             .actualRate(actualRate).discountRate(actualRate+100).promoCode(promo).startDate(startDate).build();
-                } else {
+                } else if(promo.equalsIgnoreCase(PromoCriteria.PLUS_200)) {
+                    customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
+                            .actualRate(actualRate).discountRate(actualRate+200).promoCode(promo).startDate(startDate).build();
+                }
+                else {
                     customerCar = customerCarBuilder.carModel(carModel).carNo(carNo).carType(carType)
                             .actualRate(actualRate).discountRate(applyPromocode(actualRate, promo)).promoCode(promo).startDate(startDate).build();
                 }
