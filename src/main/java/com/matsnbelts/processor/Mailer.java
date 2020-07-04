@@ -63,6 +63,7 @@ public class Mailer{
             Transport.send(message);
             System.out.println("message sent successfully to: " + to);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("message sent failed to: " + to);
             sendMailToAdmin(to, filename);
         }

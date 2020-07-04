@@ -1,5 +1,6 @@
 package com.matsnbelts.serviceImpl;
 
+import com.matsnbelts.exception.InvoiceException;
 import com.matsnbelts.model.CustomerProfile;
 import com.matsnbelts.model.InvoiceGenerator;
 import com.matsnbelts.processor.LoadCustomerDetails;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,8 +21,8 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
     public void generateInvoice(InputStream csvFileInputStream, File outputFolder,
                                 final String invoiceDate, final String paymentDueDate,
                                 final String invoiceMonth, final boolean sendMail)
-            throws IOException, ParseException {
-        System.out.println("dddkddd " + invoiceMonth);
+            throws IOException, InvoiceException {
+        System.out.println("Invoice Month " + invoiceMonth);
         LoadCustomerDetails loadCustomerDetails = new LoadCustomerDetails(invoiceMonth);
         Map<String, CustomerProfile> customerProfileMap = loadCustomerDetails
                 .loadCustomersPaymentDetails(csvFileInputStream);
@@ -42,11 +43,12 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
 
                 if(to_mail.isEmpty()) {
                     to_mail = "johnpraveen@yahoo.com";
-                    System.out.println(":::: " + customerProfileEntry.getValue().getCustomerId());
+                    System.out.println("Mail is empty for customer id:" + customerProfileEntry.getValue().getCustomerId());
                     continue;
                 }
 
-                Mailer.send(from, pwd, to_mail, "Mats And Belts - Invoice Generated for " + invoiceMonth + "'19",
+                Mailer.send(from, pwd, to_mail, "Mats And Belts - Invoice Generated for " + invoiceMonth + "'" +
+                        (Calendar.getInstance().get(Calendar.YEAR)),
                         "Hey " + customerProfileEntry.getValue().getCustomerName() +
                                 ",\n Kindly ignore if already paid. \nThis is an automatically generated email. Please do not reply to it.\n",
                         outputFolder.getAbsolutePath() + File.separator + customerProfileEntry.getValue().getCustomerId()+ ".pdf", "");
