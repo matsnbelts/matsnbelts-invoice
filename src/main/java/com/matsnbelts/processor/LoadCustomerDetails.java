@@ -71,11 +71,9 @@ public class LoadCustomerDetails {
         return discountRate;
     }
 
-    public LoadCustomerDetails(String invoiceMonth) {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
+    public LoadCustomerDetails(String invoiceMonth, int invoiceYear) {
         System.out.println("loadcust   " + invoiceMonth);
-        LocalDate convertedDate = LocalDate.parse("01/" + InvoiceGenerator.monthMap.get(invoiceMonth) + "/" + year, DateTimeFormatter.ofPattern("d/M/yyyy"));
+        LocalDate convertedDate = LocalDate.parse("01/" + InvoiceGenerator.monthMap.get(invoiceMonth) + "/" + invoiceYear, DateTimeFormatter.ofPattern("d/M/yyyy"));
         this.startDate = convertedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.endDate = convertedDate.withDayOfMonth(
             convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));

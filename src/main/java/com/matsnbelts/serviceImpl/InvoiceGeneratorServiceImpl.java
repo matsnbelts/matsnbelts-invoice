@@ -22,8 +22,17 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
                                 final String invoiceDate, final String paymentDueDate,
                                 final String invoiceMonth, final boolean sendMail)
             throws IOException, InvoiceException {
-        System.out.println("Invoice Month " + invoiceMonth);
-        LoadCustomerDetails loadCustomerDetails = new LoadCustomerDetails(invoiceMonth);
+        int invoiceYear;
+        Calendar calendar = Calendar.getInstance();
+        if(invoiceMonth.equalsIgnoreCase("December")) {
+            invoiceYear = calendar.get(Calendar.YEAR) - 1;
+
+        } else {
+            invoiceYear = calendar.get(Calendar.YEAR);
+        }
+        System.out.println("Invoice Month " + invoiceMonth + "Invoice Year " + invoiceYear);
+
+        LoadCustomerDetails loadCustomerDetails = new LoadCustomerDetails(invoiceMonth, invoiceYear);
         Map<String, CustomerProfile> customerProfileMap = loadCustomerDetails
                 .loadCustomersPaymentDetails(csvFileInputStream);
 
@@ -31,6 +40,7 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
             InvoiceGenerator.InvoiceGeneratorBuilder invoiceGeneratorBuilder = InvoiceGenerator.builder();
             InvoiceGenerator invoiceGenerator = invoiceGeneratorBuilder.customerProfile(customerProfileEntry.getValue())
                     .invoiceMonth(invoiceMonth)
+                    .invoiceYear(invoiceYear)
                     .destinationFile(outputFolder.getAbsolutePath() + File.separator + customerProfileEntry.getValue().getCustomerId() + ".pdf").build();
 
             if(!sendMail) {
@@ -48,7 +58,7 @@ public class InvoiceGeneratorServiceImpl implements InvoiceGeneratorService {
                 }
 
                 Mailer.send(from, pwd, to_mail, "Mats And Belts - Invoice Generated for " + invoiceMonth + "'" +
-                        (Calendar.getInstance().get(Calendar.YEAR)),
+                        invoiceYear,
                         "Hey " + customerProfileEntry.getValue().getCustomerName() +
                                 ",\n Kindly ignore if already paid. \nThis is an automatically generated email. Please do not reply to it.\n",
                         outputFolder.getAbsolutePath() + File.separator + customerProfileEntry.getValue().getCustomerId()+ ".pdf", "");

@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,6 +37,7 @@ public class InvoiceGenerator {
     private String cityPincode;
     private String vehicle = "Car";
     private String invoiceMonth;
+    private int invoiceYear;
 
     public static HashMap<String, String> monthMap = new LinkedHashMap<>();
     static {
@@ -148,9 +148,8 @@ public class InvoiceGenerator {
             cell = new Cell(1, 1).add(
                     getUnitsColumnParagraph(car.getCarType(), TextAlignment.LEFT));
             table.addCell(cell);
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            LocalDate convertedDate = LocalDate.parse("01/" + monthMap.get(invoiceMonth) + "/" + year , DateTimeFormatter.ofPattern("d/M/yyyy"));
+
+            LocalDate convertedDate = LocalDate.parse("01/" + monthMap.get(invoiceMonth) + "/" + invoiceYear , DateTimeFormatter.ofPattern("d/M/yyyy"));
             String endDate = convertedDate.withDayOfMonth(
                     convertedDate.getMonth().length(convertedDate.isLeapYear())).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             cell = new Cell(1, 1).add(
